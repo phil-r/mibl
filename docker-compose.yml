@@ -1,0 +1,13 @@
+version: '3'
+services:
+  api:
+    restart: unless-stopped
+    build: .
+    command: npm start
+    # command: npm run dev
+    # environment:
+    # - "ENV_VAR=env_value"
+    volumes:
+      - ./src:/app/src
+    ports:
+      - 8080:8080
