@@ -16,7 +16,6 @@
   // import sanitizeHtml from 'sanitize-html';
 
   export let slug;
-  console.log(slug);
 
   let text;
   try {

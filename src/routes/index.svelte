@@ -21,6 +21,7 @@
   $: z = d(value);
 	$: zs = i(z);
 	$: link = b64.length < z.length ? `/.${b64}` : `/${z}`
+	$: percentage = Math.floor(link.length / 20)
 </script>
 
 <style>
@@ -31,6 +32,10 @@
 </svelte:head>
 
 <textarea name="input" id="" cols="30" rows="10" bind:value />
+<p>{percentage}%</p>
+{#if percentage>100}
+	<p>Link may not work in all browsers</p>
+{/if}
 <br>
 <a rel=prefetch href={link}>Share link</a>
 <!-- <p>{b64.length} {b64}</p> -->
