@@ -10,10 +10,8 @@
 <script>
   import pako from "pako";
   import { Buffer } from "buffer";
-  // import marked from "marked";
   import MarkdownIt from "markdown-it";
   const md = new MarkdownIt();
-  // import sanitizeHtml from 'sanitize-html';
 
   export let slug;
 
@@ -30,14 +28,6 @@
 </script>
 
 <style>
-  /*
-		By default, CSS is locally scoped to the component,
-		and any unused styles are dead-code-eliminated.
-		In this page, Svelte can't know which elements are
-		going to appear inside the {{{post.html}}} block,
-		so we have to use the :global(...) modifier to target
-		all elements inside .content
-	*/
   .content :global(h2) {
     font-size: 1.4em;
     font-weight: 500;
@@ -70,7 +60,6 @@
 </svelte:head>
 
 <div class="content">
-  <!-- {@html sanitizeHtml(marked(text))} -->
   {@html md.render(text)}
 
   <hr />
@@ -79,9 +68,5 @@
     <summary>Raw:</summary>
     <pre>{text}</pre>
   </details>
-
-  <!-- <h1>Sanitized:</h1>
-
-  <pre>{sanitizeHtml(marked(text))}</pre> -->
 
 </div>
