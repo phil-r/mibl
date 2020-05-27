@@ -2,6 +2,7 @@
   import { a, b, esc, unesc } from "../util";
   import { onMount } from "svelte";
   import pako from "pako";
+  import CryptoJS from "crypto-js";
 
   let value = "";
 
@@ -27,12 +28,34 @@
     }
   };
 
+  let addPass = false;
+  let password = "";
+  let link;
+
   $: b64 = b(esc(value));
   $: b64s = unesc(a(b64));
   $: z = d(value);
   $: zs = i(z);
-  $: link = b64.length < z.length ? `/.${b64}` : `/${z}`;
   $: percentage = Math.floor(link.length / 20);
+  $: ciphertext = CryptoJS.AES.encrypt(value, password).toString();
+  $: ciphertext3 = CryptoJS.AES.encrypt(z, password).toString();
+  // $: decoded = CryptoJS.AES.decrypt(ciphertext, password).toString(
+  //   CryptoJS.enc.Utf8
+  // );
+  // $: decoded3 = i(
+  //   CryptoJS.AES.decrypt(ciphertext3, password).toString(CryptoJS.enc.Utf8)
+  // );
+  // $: link = b64.length < z.length ? `/.${b64}` : `/${z}`;
+  $: {
+    if (addPass) {
+      link =
+        ciphertext.length < ciphertext3.length
+          ? `/:.${ciphertext}`
+          : `/:${ciphertext3}`;
+    } else {
+      link = b64.length < z.length ? `/.${b64}` : `/${z}`;
+    }
+  }
 </script>
 
 <style>
@@ -43,19 +66,26 @@
   <title>Text in a link</title>
 </svelte:head>
 
-<textarea
-  name="input"
-  id=""
-  cols="30"
-  rows="10"
-  bind:value
-  on:input={handleInput} />
+<textarea name="input" cols="30" rows="10" bind:value on:input={handleInput} />
 <p>{percentage}%</p>
 {#if percentage > 100}
   <p>Link may not work in all browsers</p>
 {/if}
+
+<label>
+  <input type="checkbox" bind:checked={addPass} />
+  Add password
+</label>
+{#if addPass}
+  <input type="password" bind:value={password} />
+{/if}
+<br />
 <br />
 <a rel="prefetch" href={link}>Share link</a>
+<!-- <p>{ciphertext.length} - {ciphertext}</p>
+<p>{decoded}</p>
+<p>{ciphertext3.length} - {ciphertext3}</p>
+<p>{decoded3}</p> -->
 <!-- <p>{b64.length} {b64}</p> -->
 <!-- <p>{b64s}</p> -->
 <!-- <p>{z.length} {z}</p> -->
