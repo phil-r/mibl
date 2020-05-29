@@ -5,11 +5,12 @@
   "scripts": {
     "dev": "sapper dev",
     "build": "sapper build",
-    "export": "sapper export",
+    "export": "sapper export --entry /.YQ== && cp __sapper__/export/.YQ==/index.html __sapper__/export/200.html",
     "start": "node __sapper__/build",
     "cy:run": "cypress run",
     "cy:open": "cypress open",
-    "test": "run-p --race dev cy:run"
+    "test": "run-p --race dev cy:run",
+    "deploy": "surge __sapper__/export x.rukin.me"
   },
   "dependencies": {
     "buffer": "^5.6.0",

@@ -3,7 +3,7 @@
 
   export async function preload({ params, query }) {
     const slug = params.slug.join("/");
-    return { slug };
+    return { slug, query };
   }
 </script>
 
@@ -12,23 +12,23 @@
   import { Buffer } from "buffer";
   import MarkdownIt from "markdown-it";
   import CryptoJS from "crypto-js";
+  import { onMount } from "svelte";
   const md = new MarkdownIt();
 
   export let slug;
+  export let query;
 
   let error;
   let ciphertext;
-  let plaintext;
+  let plaintext = "";
   let password = "";
   let encrypted = false;
 
   const decrypt = (ciphertext, password) => {
     let result = "Provide correct password";
     try {
-      
       if (ciphertext.startsWith(".")) {
         result =
-          
           CryptoJS.AES.decrypt(ciphertext.slice(1), password).toString(
             CryptoJS.enc.Utf8
           ) || result;
@@ -49,22 +49,29 @@
     }
     return result;
   };
-
-  try {
-    if (slug.startsWith(":")) {
-      // this is encrypted
-      encrypted = true;
-      ciphertext = slug.slice(1);
-    } else {
-      if (slug.startsWith(".")) {
-        plaintext = unesc(a(slug.slice(1)));
-      } else {
-        plaintext = pako.inflate(Buffer.from(slug, "base64"), { to: "string" });
-      }
+  onMount(() => {
+    if (typeof window ==='object') { // working around sapper SSR
+      slug = window.location.pathname.slice(1);
     }
-  } catch (err) {
-    error = err;
-  }
+    
+    try {
+      if (slug.startsWith(":")) {
+        // this is encrypted
+        encrypted = true;
+        ciphertext = slug.slice(1);
+      } else {
+        if (slug.startsWith(".")) {
+          plaintext = unesc(a(slug.slice(1)));
+        } else {
+          plaintext = pako.inflate(Buffer.from(slug, "base64"), {
+            to: "string"
+          });
+        }
+      }
+    } catch (err) {
+      error = err;
+    }
+  });
 
   $: text = encrypted ? decrypt(ciphertext, password) : plaintext;
 </script>
@@ -95,6 +102,13 @@
   .content :global(li) {
     margin: 0 0 0.5em 0;
   }
+
+  .debug {
+   background: black;
+   color:white;
+   position: fixed;
+   bottom: 0;
+  }
 </style>
 
 <svelte:head>
@@ -123,5 +137,16 @@
     <summary>Raw:</summary>
     <pre>{text}</pre>
   </details>
+
+  {#if query.debug}
+  <div class="debug">
+    Slug: {slug}; 
+    err: {error};
+    ciphertext: {ciphertext};
+    plaintext: {plaintext};
+    password: {password};
+    encrypted: {encrypted};
+  </div>
+  {/if}
 
 </div>
