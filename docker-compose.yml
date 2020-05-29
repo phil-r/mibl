@@ -11,3 +11,22 @@ services:
       - ./src:/app/src
     ports:
       - 3000:3000
+    networks:
+      # - external_network
+      - internal_network
+
+  caddy:
+    restart: unless-stopped
+    image: caddy:alpine
+    command: caddy reverse-proxy --to api:3000 --from x.rukin.me
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - external_network
+      - internal_network
+
+networks:
+  external_network:
+  internal_network:
+    internal: true
